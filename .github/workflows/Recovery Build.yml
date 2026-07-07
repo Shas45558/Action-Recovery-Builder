@@ -14,11 +14,11 @@ on:
       DEVICE_TREE_URL:
         description: 'DEVICE_TREE_URL'
         required: true
-        default: 'https://github.com/Shas45558/twrp_tree_mt6768.git'
+        default: 'https://github.com/Shas45558/S_a13_twrp.git'
       DEVICE_TREE_BRANCH:
         description: 'DEVICE_TREE_BRANCH'
         required: true
-        default: 'a13rlwok'
+        default: 'main'
       DEVICE_PATH:
         description: 'DEVICE_PATH'
         required: true
