@@ -14,11 +14,11 @@ on:
       DEVICE_TREE_URL:
         description: 'DEVICE_TREE_URL'
         required: true
-        default: 'https://github.com/Shas45558/S_a13_twrp.git'
+        default: 'https://github.com/Shas45558/S-Vendor-Twrp-Tree-for-mt6768.git'
       DEVICE_TREE_BRANCH:
         description: 'DEVICE_TREE_BRANCH'
         required: true
-        default: 'main'
+        default: 'a13_new_lancelot'
       DEVICE_PATH:
         description: 'DEVICE_PATH'
         required: true
