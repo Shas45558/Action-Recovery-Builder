@@ -170,6 +170,7 @@ jobs:
         export BUILD_BROKEN_PLUGIN_VALIDATION="soong-libaosprecovery_defaults,soong-libguitwrp_defaults,soong-libminuitwrp_defaults,soong-vold_defaults"
         lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng
         echo $BUILD_BROKEN_PLUGIN_VALIDATION
+        cat out/soong/soong.twrp_lancelot.variables | grep BuildBrokenPluginValidation || true
         make clean
         rm -rf out/soong
         rm -rf out/.module_paths
