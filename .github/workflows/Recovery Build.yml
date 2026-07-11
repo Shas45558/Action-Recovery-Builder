@@ -157,7 +157,12 @@ jobs:
         git -C bootable/recovery remote -v
         git -C bootable/recovery branch        
         grep -R "soong-libaosprecovery_defaults" -n bootable/recovery build vendor device || true
-        
+
+    - name: Check Soong plugin support
+      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
+      run: |
+        grep -R "BuildBrokenPluginValidation" -n build/soong || true
+        grep -R "BUILD_BROKEN_PLUGIN_VALIDATION" -n build/soong || true
     - name: Building recovery
       run: |
         source build/envsetup.sh
