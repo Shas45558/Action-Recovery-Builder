@@ -112,6 +112,7 @@ jobs:
         git config --global user.name "Nico170420"
         git config --global user.email "b170420nc@gmail.com"
         repo init --depth=1 -u ${{ github.event.inputs.MANIFEST_URL }} -b ${{ github.event.inputs.MANIFEST_BRANCH }}
+        git clone https://android.googlesource.com/platform/external/f2fs-tools external/f2fs-tools
       id: pwd
 
     - name: Repo Sync
