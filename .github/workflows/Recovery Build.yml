@@ -6,11 +6,11 @@ on:
       MANIFEST_URL:
         description: 'MANIFEST_URL (if want to use SSH keys, use git@github.com:XXXXX)'
         required: true
-        default: 'https://github.com/Shas45558/Twrp_14_manifest.git'
+        default: 'https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git'
       MANIFEST_BRANCH:
         description: 'MANIFEST_BRANCH'
         required: true
-        default: 'twrp-14'
+        default: 'twrp-12.1'
       DEVICE_TREE_URL:
         description: 'DEVICE_TREE_URL'
         required: true
@@ -36,7 +36,7 @@ on:
       MAKEFILE_NAME:
         description: 'MAKEFILE_NAME'
         required: true
-        default: 'twrp_lancelot-ap2a'
+        default: 'twrp_lancelot'
       BUILD_TARGET:
         description: 'BUILD_TARGET'
         required: true
@@ -117,9 +117,6 @@ jobs:
     - name: Repo Sync
       run: |
         repo sync -j$(nproc --all) --force-sync
-        if [ ! -d external/f2fs-tools ]; then
-          git clone -b android-12.1.0_r27 https://android.googlesource.com/platform/external/f2fs-tools external/f2fs-tools
-        fi
       working-directory: workspace
 
     - name: Clone device tree
