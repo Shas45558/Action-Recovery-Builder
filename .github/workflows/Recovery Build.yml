@@ -112,12 +112,14 @@ jobs:
         git config --global user.name "Nico170420"
         git config --global user.email "b170420nc@gmail.com"
         repo init --depth=1 -u ${{ github.event.inputs.MANIFEST_URL }} -b ${{ github.event.inputs.MANIFEST_BRANCH }}
-        git clone https://android.googlesource.com/platform/external/f2fs-tools external/f2fs-tools
       id: pwd
 
     - name: Repo Sync
       run: |
         repo sync -j$(nproc --all) --force-sync
+        if [ ! -d external/f2fs-tools ]; then
+          git clone -b android-12.1.0_r27 https://android.googlesource.com/platform/external/f2fs-tools external/f2fs-tools
+        fi
       working-directory: workspace
 
     - name: Clone device tree
