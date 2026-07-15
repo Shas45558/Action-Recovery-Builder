@@ -158,12 +158,26 @@ jobs:
         swap-size-gb: 12
 
     - name: Building recovery
+      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
       run: |
         source build/envsetup.sh
-        export ALLOW_MISSING_DEPENDENCIES=true
-        lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng && make clean && make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
-      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
+        export ALLOW_MISSING_DEPENDENCIES=true
+
+        echo "===== AndroidProducts.mk ====="
+        find device -name AndroidProducts.mk
+
+        echo "===== Device tree files ====="
+        find device/xiaomi/mt6768 -maxdepth 2 -type f | sort
+
+        echo "===== Available lunch combos ====="
+        lunch || true
+
+        echo "===== Building ====="
+        lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng
+
+        make clean
+        make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
       with:
