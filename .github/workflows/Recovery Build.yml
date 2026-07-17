@@ -14,19 +14,19 @@ on:
       DEVICE_TREE:
         description: 'Custom Recovery Tree'
         required: true
-        default: 'https://github.com/kinguser981/android_device_xiaomi_marble-OFRP'
+        default: 'https://github.com/Shas45558/S_mt6768_twrp.git'
       DEVICE_TREE_BRANCH:
         description: 'Custom Recovery Tree Branch'
         required: true
-        default: 'fox_12.1'
+        default: 'twrp-12.1'
       DEVICE_PATH:
         description: 'Specify your device path.'
         required: true
-        default: 'device/xiaomi/marble'
+        default: 'device/xiaomi/lancelot'
       DEVICE_NAME:
         description: 'Specify your Device Codename.'
         required: true
-        default: 'marble'
+        default: 'lancelot'
       BUILD_TARGET:
         description: 'Specify your Build Target'
         required: true
