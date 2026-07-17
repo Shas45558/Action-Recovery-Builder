@@ -110,19 +110,7 @@ jobs:
     - name: Clone Device Dependencies
       run: |
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
-        if [ -f "${{ github.event.inputs.DEVICE_PATH }}/twrp.dependencies" ]; then
-        echo "Syncing twrp.dependencies..."
-        bash ${GITHUB_WORKSPACE}/scripts/convert.sh \
-        ${{ github.event.inputs.DEVICE_PATH }}/twrp.dependencies
-        repo sync -j$(nproc --all) --force-sync
-        elif [ -f "${{ github.event.inputs.DEVICE_PATH }}/ofox.dependencies" ]; then
-        echo "Syncing ofox.dependencies..."
-        bash ${GITHUB_WORKSPACE}/scripts/convert.sh \
-        ${{ github.event.inputs.DEVICE_PATH }}/ofox.dependencies
-        repo sync -j$(nproc --all) --force-sync
-        else
-        echo "No dependency file found."
-        fi    
+        git clone depth=1 https://github.com/Shas45558/S_vendor_android_kernel_xiaomi_mt6768.git /kernel/xiaomi/mt6768
 
     - name: Check Manifest Branch
       uses: haya14busa/action-cond@v1
