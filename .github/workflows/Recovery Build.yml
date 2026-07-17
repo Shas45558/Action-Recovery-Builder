@@ -3,14 +3,14 @@ name: Recovery Build
 on:
   workflow_dispatch:
     inputs:
-      MANIFEST_URL:
-        description: 'MANIFEST_URL (if want to use SSH keys, use git@github.com:XXXXX)'
+      SYNC_URL:
+        description: 'SYNC_URL'
         required: true
         default: 'https://gitlab.com/OrangeFox/sync.git'
       MANIFEST_BRANCH:
         description: 'MANIFEST_BRANCH'
         required: true
-        default: 'fox_12.1'
+        default: '12.1'
       DEVICE_TREE_URL:
         description: 'DEVICE_TREE_URL'
         required: true
@@ -49,19 +49,7 @@ jobs:
     permissions:
       contents: write
     steps:
-    - name: Display Run Parameters
-      run: |
-        echo "::group::User Environment Variables"
-        echo "Manifest URL: ${{ github.event.inputs.MANIFEST_URL }}"
-        echo "Manifest Branch: ${{ github.event.inputs.MANIFEST_BRANCH }}"
-        echo "Device Tree URL: ${{ github.event.inputs.DEVICE_TREE_URL }}"
-        echo "Device Tree Branch: ${{ github.event.inputs.DEVICE_TREE_BRANCH }}"
-        echo "Device Path: ${{ github.event.inputs.DEVICE_PATH }}"
-        echo "Device Name: ${{ github.event.inputs.DEVICE_NAME }}"
-        echo "Makefile Name: ${{ github.event.inputs.MAKEFILE_NAME }}"
-        echo "Build Target: ${{ github.event.inputs.BUILD_TARGET }}.img"
-        echo "::endgroup::"
-
+ 
     # You might want to Checkout your repo first, but not mandatory
     - name: Check Out
       uses: actions/checkout@v4
@@ -69,18 +57,26 @@ jobs:
     # Cleanup The Actions Workspace Using Custom Composite Run Actions
     - name: Cleanup
       uses: rokibhasansagar/slimhub_actions@main
-      # That's it! Now use your normal steps
 
-    - name: Prepare the environment
+    - name: Initialize workspace
+      run: |
+        mkdir workspace
+        cd workspace
+        echo "workspace-folder=$(pwd)" >> $GITHUB_OUTPUT
+      id: pwd
+
+    - name: Prepare the build environment
       run: |
         sudo apt update && sudo apt upgrade -y
         DEBIAN_FRONTEND=noninteractive sudo apt install -yq \
             linux-modules-extra-$(uname -r) \
-            gperf gcc-multilib gcc-10-multilib g++-multilib g++-10-multilib \
-            libc6-dev lib32ncurses-dev x11proto-core-dev libx11-dev tree lib32z-dev libgl1-mesa-dev libxml2-utils \
-            xsltproc bc ccache lib32readline-dev lib32z1-dev liblz4-tool libncurses-dev libsdl1.2-dev \
-            build-essential libgtk-3-dev libglu1-mesa-dev freeglut3-dev git libxml2 lzop pngcrush schedtool squashfs-tools \
-            imagemagick libbz2-dev lzma ncftp qemu-user-static libstdc++-10-dev libncurses6 python3 tar
+            git python3 tar aria2
+        git clone https://gitlab.com/OrangeFox/misc/scripts
+        cd scripts
+        sudo bash setup/android_build_env.sh
+        sed -i 's/cd -/cd ../g' setup/install_android_sdk.sh
+        sudo bash setup/install_android_sdk.sh
+      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
     - name: Install OpenJDK
       uses: actions/setup-java@v4
@@ -89,7 +85,7 @@ jobs:
         java-version: '11'
 
     - name: Setup SSH Keys
-      if: ${{ startsWith(github.event.inputs.MANIFEST_URL, 'git@github.com') || 
+      if: ${{ startsWith(github.event.inputs.SYNC_URL, 'git@github.com') || 
           startsWith(github.event.inputs.DEVICE_TREE_URL, 'git@github.com') ||
           startsWith(github.event.inputs.COMMON_TREE_URL, 'git@github.com') }}
       uses: webfactory/ssh-agent@v0.9.0
@@ -97,53 +93,37 @@ jobs:
           ssh-private-key: |
             ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Install repo
+    - name: Sync OrangeFox sources and minimal manifest
       run: |
-        mkdir ~/bin
-        curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
-        chmod a+x ~/bin/repo
-        sudo ln -sf ~/bin/repo /usr/bin/repo
-
-    - name: Initialize repo
-      run: |
-        mkdir workspace
-        cd workspace
-        echo "workspace-folder=$(pwd)" >> $GITHUB_OUTPUT
-        git config --global user.name "Nico170420"
-        git config --global user.email "b170420nc@gmail.com"
-        repo init --depth=1 -u ${{ github.event.inputs.MANIFEST_URL }} -b ${{ github.event.inputs.MANIFEST_BRANCH }}
-      id: pwd
-
-    - name: Repo Sync
-      run: |
-        repo sync -j$(nproc --all) --force-sync
-      working-directory: workspace
+        cd ${{ steps.pwd.outputs.workspace-folder }}
+        git clone ${{ github.event.inputs.SYNC_URL }}
+        cd sync
+        ./orangefox_sync.sh --branch ${{ github.event.inputs.MANIFEST_BRANCH }} --path ${{ steps.pwd.outputs.workspace-folder }}/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
+      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
     - name: Clone device tree
       run: |
-        git clone ${{ github.event.inputs.DEVICE_TREE_URL }} \
-          -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} \
-          ./${{ github.event.inputs.DEVICE_PATH }}
-
-        echo "===== Device tree ====="
-        ls -la ./${{ github.event.inputs.DEVICE_PATH }}
-        find ./${{ github.event.inputs.DEVICE_PATH }} -maxdepth 2 -type f | sort
+        cd ${{ steps.pwd.outputs.workspace-folder }}/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
+        git clone ${{ github.event.inputs.DEVICE_TREE_URL }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ./${{ github.event.inputs.DEVICE_PATH }}
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
+      
+    - name: Sync device dependencies
+      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
+      run: |
+        cd ${{ steps.pwd.outputs.workspace-folder }}/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
+        if [ -f "${{ github.event.inputs.DEVICE_PATH }}/twrp.dependencies" ]; then
+        bash ${GITHUB_WORKSPACE}/scripts/convert.sh \
+        ${{ github.event.inputs.DEVICE_PATH }}/twrp.dependencies
+        repo sync -j$(nproc)
+        fi
     - name: Clone common tree
       if: |
         github.event.inputs.COMMON_TREE_URL != null
         && github.event.inputs.COMMON_PATH != null
       run: |
+        cd ${{ steps.pwd.outputs.workspace-folder }}/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
         git clone ${{ github.event.inputs.COMMON_TREE_URL }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ./${{ github.event.inputs.COMMON_PATH }}
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
-
-    - name: Sync Device Dependencies
-      run: |
-        bash ${GITHUB_WORKSPACE}/scripts/convert.sh \
-        ${{ github.event.inputs.DEVICE_PATH }}/twrp.dependencies
-        repo sync -j$(nproc --all)
-      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
-      continue-on-error: true
 
     - name: Set Swap Space
       uses: pierotofy/set-swap-space@master
@@ -151,26 +131,40 @@ jobs:
         swap-size-gb: 12
 
     - name: Building recovery
-      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
       run: |
+        cd ${{ steps.pwd.outputs.workspace-folder }}/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
+        set +e
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
+        set -e
         export FOX_BUILD_DEVICE=${{ github.event.inputs.DEVICE_NAME }}
+        export ALLOW_MISSING_DEPENDENCIES=true
+        if [ -f "${{ github.event.inputs.DEVICE_PATH }}/vendorsetup.sh" ]; then
+        source "${{ github.event.inputs.DEVICE_PATH }}/vendorsetup.sh"
+        fi
         lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng
         mka clean
-        mka ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
+        mka recoveryimage -j$(nproc)
+      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
+      continue-on-error: true
+
+    - name: Check the output directory before uploading
+      run: |
+        ls -al ${{ steps.pwd.outputs.workspace-folder }}/fox_${{ github.event.inputs.MANIFEST_BRANCH }}/out/target/product/
+        echo
+        ls -al ${{ steps.pwd.outputs.workspace-folder }}/fox_${{ github.event.inputs.MANIFEST_BRANCH }}/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/
+
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
       with:
-        files: | 
-          workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/${{ github.event.inputs.BUILD_TARGET }}.img
-          workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/*.zip
-          workspace/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/*vendor*.img
+        files: |
+          ${{ steps.pwd.outputs.workspace-folder }}/fox_${{ github.event.inputs.MANIFEST_BRANCH }}/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/*.img
+          ${{ steps.pwd.outputs.workspace-folder }}/fox_${{ github.event.inputs.MANIFEST_BRANCH }}/out/target/product/${{ github.event.inputs.DEVICE_NAME }}/*.zip
         name: ${{ github.event.inputs.DEVICE_NAME }}-${{ github.run_id }}
         tag_name: ${{ github.run_id }}
         body: |
           Manifest: ${{ github.event.inputs.MANIFEST_BRANCH }}
           Device: ${{ github.event.inputs.DEVICE_NAME }}
-          Target: ${{ github.event.inputs.BUILD_TARGET }}.img
+          Target: ${{ github.event.inputs.BUILD_TARGET }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
