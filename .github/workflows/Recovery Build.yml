@@ -111,10 +111,10 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_12.1
         mkdir -p kernel/xiaomi
-        mkdir -p prebuilts/clang/host/linux-x86/clang-ext
-        git clone --depth 1 https://github.com/Shas45558/oc_s_mt6768_kernel.git  -b lineage-23.2 kernel/xiaomi/mt6768
-        git clone --depth 1 https://github.com/vijaymalav564/vortex-clang.git -b master  prebuilts/clang/host/linux-x86/clang-ext
-        export PATH=${GITHUB_WORKSPACE}/OrangeFox/fox_12.1/prebuilts/clang/host/linux-x86/clang-ext/bin:$PATH
+        # mkdir -p prebuilts/clang/host/linux-x86/clang-ext
+        git clone --depth 1 https://github.com/Shas45558/S_old.git  -b lineage-20 kernel/xiaomi/mt6768
+        # git clone --depth 1 https://github.com/vijaymalav564/vortex-clang.git -b master  prebuilts/clang/host/linux-x86/clang-ext
+        # export PATH=${GITHUB_WORKSPACE}/OrangeFox/fox_12.1/prebuilts/clang/host/linux-x86/clang-ext/bin:$PATH
 
     - name: Check Manifest Branch
       uses: haya14busa/action-cond@v1
