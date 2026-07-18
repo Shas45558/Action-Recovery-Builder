@@ -115,7 +115,7 @@ jobs:
         git clone --depth 1 https://github.com/Shas45558/oc_s_mt6768_kernel.git  -b lineage-23.2 kernel/xiaomi/mt6768
         wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r547379.tar.gz -O clang-r547379.tar.gz
         tar -xzf clang-r547379.tar.gz -C prebuilts/clang/host/linux-x86/clang-ext
-        echo ${GITHUB_WORKSPACE}/OrangeFox/fox_12.1/prebuilts/clang/host/linux-x86/clang-ext/bin" >> $GITHUB_PATH
+        echo "${GITHUB_WORKSPACE}/OrangeFox/fox_12.1/prebuilts/clang/host/linux-x86/clang-ext/bin" >> $GITHUB_PATH
 
     - name: Check Manifest Branch
       uses: haya14busa/action-cond@v1
