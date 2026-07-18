@@ -111,9 +111,7 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_12.1
         mkdir -p kernel/xiaomi
-        git clone --depth 1 \
-        https://github.com/Shas45558/S_vendor_android_kernel_xiaomi_mt6768.git \
-        kernel/xiaomi/mt6768
+        git clone --depth 1 https://github.com/Shas45558/oc_a13r.git  -b lineage-23.2 kernel/xiaomi/mt6768
 
     - name: Check Manifest Branch
       uses: haya14busa/action-cond@v1
