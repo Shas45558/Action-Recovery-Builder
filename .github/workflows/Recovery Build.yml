@@ -102,6 +102,7 @@ jobs:
   Build_ofox:
     name: Build OFRP by ${{ github.actor }}
     runs-on: ubuntu-latest
+    needs: repo_sync
     if: github.event.repository.owner.id == github.event.sender.id
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -111,6 +112,7 @@ jobs:
     - name: Clone Device Tree
       run: |
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
+        rm -rf ./${{ github.event.inputs.DEVICE_PATH }}
         git clone ${{ github.event.inputs.DEVICE_TREE }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ./${{ github.event.inputs.DEVICE_PATH }}
         cd ${{ github.event.inputs.DEVICE_PATH }}
         echo "COMMIT_ID=$(git rev-parse HEAD)" >> $GITHUB_ENV
@@ -118,6 +120,7 @@ jobs:
     - name: Clone Device Dependencies and clang
       run: |
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
+        rm -rf kernel/xiaomi/mt6768
         mkdir -p kernel/xiaomi
         # mkdir -p prebuilts/clang/host/linux-x86/clang-ext
         git clone --depth 1 https://github.com/Shas45558/S_old.git  -b lineage-20 kernel/xiaomi/mt6768
