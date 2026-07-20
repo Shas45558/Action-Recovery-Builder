@@ -27,6 +27,10 @@ on:
         description: 'Specify your Device Codename.'
         required: true
         default: 'lancelot'
+      Lunch:
+        description: 'What you want to build?'
+        required: true
+        default: 'twrp_lancelot-ap2a-eng'
       BUILD_TARGET:
         description: 'Specify your Build Target'
         required: true
@@ -139,7 +143,7 @@ jobs:
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         set -e
-        ${{ steps.fox_branch.outputs.value }}
+        lunch ${{ github.event.inputs.Lunch }}
 
     - name: Set Build Date 
       run: |
