@@ -109,7 +109,7 @@ jobs:
         cd ${GITHUB_WORKSPACE}/OrangeFox
         git config --global user.name "Samuel Kendall"
         git config --global user.email "kinguser981@gmail.com"
-        git clone https://gitlab.com
+        git clone https://gitlab.com/OrangeFox/sync.git
         cd sync
         ./orangefox_sync.sh --branch ${{ github.event.inputs.MANIFEST_BRANCH }} --path ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
 
@@ -127,7 +127,7 @@ jobs:
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
         rm -rf kernel/xiaomi/mt6768
         mkdir -p kernel/xiaomi
-        git clone --depth 1 https://github.com  -b lineage-20 kernel/xiaomi/mt6768
+        git clone --depth 1 https://github.com/Shas45558/S_old.git  -b lineage-20 kernel/xiaomi/mt6768
 
     - name: Check Manifest Branch
       uses: haya14busa/action-cond@v1
