@@ -2,6 +2,11 @@ name: Recovery Build
 on:
   workflow_dispatch:
     inputs:
+      SKIP_SYNC:
+        description: 'SKIP REPO SYNC? (Check this ONLY if your previous build failed and you just want to re-compile)'
+        type: boolean
+        required: true
+        default: false
       MANIFEST_BRANCH:
         description: 'OrangeFox Branch'
         required: true
@@ -14,7 +19,7 @@ on:
       DEVICE_TREE:
         description: 'Custom Recovery Tree'
         required: true
-        default: 'https://github.com/Shas45558/S_mt6768_twrp.git'
+        default: 'https://github.com'
       DEVICE_TREE_BRANCH:
         description: 'Custom Recovery Tree Branch'
         required: true
@@ -52,7 +57,7 @@ on:
         default: true
 
 jobs:
-  repo_sync:
+  build:
     name: Build OFRP by ${{ github.actor }}
     runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
@@ -67,7 +72,7 @@ jobs:
     - name: Display Inputs
       run: |
         echo "::group::User Environment Variables"
-        echo "Displaying variables/inputs."
+        echo "Skip Repo Sync: ${{ github.event.inputs.SKIP_SYNC }}"
         echo "Include Recovery Installer: ${{ github.event.inputs.RECOVERY_INSTALLER }}"
         echo "Release recovery.tar For Samsung devices: ${{ github.event.inputs.RECOVERY_TAR }}"
         echo "::endgroup::"
@@ -79,36 +84,37 @@ jobs:
       uses: pierotofy/set-swap-space@master
       with:
         swap-size-gb: 24
-      
-    - name: Build Environment
+
+    # 1. We cache the entire pulled OrangeFox directory based on the selected branch.
+    - name: Cache OrangeFox Source
+      id: cache-source
+      uses: actions/cache@v4
+      with:
+        path: ${{ github.workspace }}/OrangeFox
+        key: ofrp-source-${{ github.event.inputs.MANIFEST_BRANCH }}
+
+    - name: Build Environment Setup
       run: |
         sudo apt update
         sudo apt -y upgrade
         rm -rf scripts
-        git clone https://gitlab.com/OrangeFox/misc/scripts
+        git clone https://gitlab.com
         cd scripts
         sudo bash setup/android_build_env.sh
       
+    # 2. This step runs ONLY if SKIP_SYNC is false AND the cache doesn't already exist.
     - name: Set-up Manifest
-      if: github.event.inputs.MANIFEST_BRANCH == '11.0' || github.event.inputs.MANIFEST_BRANCH == '12.1' || github.event.inputs.MANIFEST_BRANCH == '14.1'
+      if: ${{ github.event.inputs.SKIP_SYNC == 'false' && steps.cache-source.outputs.cache-hit != 'true' && (github.event.inputs.MANIFEST_BRANCH == '11.0' || github.event.inputs.MANIFEST_BRANCH == '12.1' || github.event.inputs.MANIFEST_BRANCH == '14.1') }}
       run: |
         mkdir -p ${GITHUB_WORKSPACE}/OrangeFox
         cd ${GITHUB_WORKSPACE}/OrangeFox
         git config --global user.name "Samuel Kendall"
         git config --global user.email "kinguser981@gmail.com"
-        git clone https://gitlab.com/OrangeFox/sync.git
+        git clone https://gitlab.com
         cd sync
         ./orangefox_sync.sh --branch ${{ github.event.inputs.MANIFEST_BRANCH }} --path ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
-  Build_ofox:
-    name: Build OFRP by ${{ github.actor }}
-    runs-on: ubuntu-latest
-    needs: repo_sync
-    if: github.event.repository.owner.id == github.event.sender.id
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    permissions:
-      contents: write
-    steps:
+
+    # 3. Always clean the tree destination step to avoid "Folder already exists" errors when rerun.
     - name: Clone Device Tree
       run: |
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
@@ -122,10 +128,7 @@ jobs:
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
         rm -rf kernel/xiaomi/mt6768
         mkdir -p kernel/xiaomi
-        # mkdir -p prebuilts/clang/host/linux-x86/clang-ext
-        git clone --depth 1 https://github.com/Shas45558/S_old.git  -b lineage-20 kernel/xiaomi/mt6768
-        # git clone --depth 1 https://github.com/vijaymalav564/vortex-clang.git -b master  prebuilts/clang/host/linux-x86/clang-ext
-        # export PATH=${GITHUB_WORKSPACE}/OrangeFox/fox_12.1/prebuilts/clang/host/linux-x86/clang-ext/bin:$PATH
+        git clone --depth 1 https://github.com  -b lineage-20 kernel/xiaomi/mt6768
 
     - name: Check Manifest Branch
       uses: haya14busa/action-cond@v1
@@ -144,7 +147,7 @@ jobs:
         set -e
         ${{ steps.fox_branch.outputs.value }}
 
-    - name: Set Build Date # Output will be use in Release
+    - name: Set Build Date 
       run: |
         echo "BUILD_DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
         DEVICE_TREE_URL="${{ github.event.inputs.DEVICE_TREE }}"
@@ -166,7 +169,7 @@ jobs:
             echo "MD5_IMG=$(md5sum out/target/product/${{ github.event.inputs.DEVICE_NAME }}/target/product/${{ github.event.inputs.DEVICE_NAME }}/OrangeFox*.img | cut -d ' ' -f 1)" >> $GITHUB_ENV
         else
             echo "Recovery out directory is empty."
-            cd Exit
+            exit 1
         fi
 
     - name: Rename the Recovery
@@ -175,17 +178,12 @@ jobs:
         if [ "${{ github.event.inputs.BUILD_TARGET }}" = "boot" ]; then
         mv OrangeFox*.img boot.img
         echo "RECOVERY_TYPE=boot" >> $GITHUB_ENV
-        echo "boot.img file found!"
         elif [ "${{ github.event.inputs.BUILD_TARGET }}" = "recovery" ]; then
         mv OrangeFox*.img recovery.img
         echo "RECOVERY_TYPE=recovery" >> $GITHUB_ENV
-        echo "recovery.img file found!"
         elif [ "${{ github.event.inputs.BUILD_TARGET }}" = "vendorboot" ]; then
         mv OrangeFox*.img vendor_boot.img
         echo "RECOVERY_TYPE=vendor_boot" >> $GITHUB_ENV
-        echo "vendor_boot.img file found!"
-        else
-        echo "No Recovery file found!"
         fi
       continue-on-error: true
       
@@ -193,7 +191,7 @@ jobs:
       run: |
         if [ ${{ github.event.inputs.RECOVERY_INSTALLER }} = true ]; then
           cd ${{ env.FILE_PATH }}/
-          wget https://github.com/kinguser981/recovery-installer/releases/download/11256427880/recovery-installer.zip
+          wget https://github.com
           zip -ur recovery-installer.zip ${{ env.RECOVERY_TYPE }}.img
         fi
       continue-on-error: true
@@ -205,7 +203,6 @@ jobs:
           tar -cvf ${{ env.RECOVERY_TYPE }}.tar ${{ env.RECOVERY_TYPE }}.img
         fi
       continue-on-error: true
-
     - name: Upload to Release
       if: env.CHECK_IMG_IS_OK == 'true'
       uses: softprops/action-gh-release@v1
