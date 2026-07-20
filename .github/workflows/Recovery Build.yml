@@ -2,11 +2,6 @@ name: Recovery Build
 on:
   workflow_dispatch:
     inputs:
-      SKIP_SYNC:
-        description: 'SKIP REPO SYNC? (Check this ONLY if your previous build failed and you just want to re-compile)'
-        type: boolean
-        required: true
-        default: false
       MANIFEST_BRANCH:
         description: 'OrangeFox Branch'
         required: true
@@ -103,7 +98,7 @@ jobs:
         sudo bash setup/android_build_env.sh
     # 2. This step runs ONLY if SKIP_SYNC is false AND the cache doesn't already exist.
     - name: Set-up Manifest
-      if: ${{ github.event.inputs.SKIP_SYNC == 'false' && steps.cache-source.outputs.cache-hit != 'true' && (github.event.inputs.MANIFEST_BRANCH == '11.0' || github.event.inputs.MANIFEST_BRANCH == '12.1' || github.event.inputs.MANIFEST_BRANCH == '14.1') }}
+      if: ${{ steps.cache-source.outputs.cache-hit != 'true' && (github.event.inputs.MANIFEST_BRANCH == '11.0' || github.event.inputs.MANIFEST_BRANCH == '12.1' || github.event.inputs.MANIFEST_BRANCH == '14.1') }}
       run: |
         mkdir -p ${GITHUB_WORKSPACE}/OrangeFox
         cd ${GITHUB_WORKSPACE}/OrangeFox
