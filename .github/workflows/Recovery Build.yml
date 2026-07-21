@@ -140,7 +140,7 @@ jobs:
         rm -rf kernel/xiaomi/mt6768
         mkdir -p kernel/xiaomi
         git clone --depth 1 https://github.com/mt6768-dev/android_kernel_xiaomi_mt6768.git -b lineage-23.2 kernel/xiaomi/mt6768
-        git clone --depth 1 -b master prebuilts/clang/host/linux-x86/clang-ext
+        git clone --depth 1 https://github.com/Shas45558/vortex-clang.git -b master prebuilts/clang/host/linux-x86/clang-ext
     - name: Check Manifest Branch
       uses: haya14busa/action-cond@v1
       id: fox_branch
