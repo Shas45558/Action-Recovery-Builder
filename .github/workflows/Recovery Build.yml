@@ -140,12 +140,9 @@ jobs:
         rm -rf kernel/xiaomi/mt6768
         mkdir -p kernel/xiaomi
         git clone --depth 1 https://github.com/Shas45558/oc_s_mt6768_kernel.git -b lineage-23.2 kernel/xiaomi/mt6768
-        git clone --depth 1 https://github.com/Shas45558/vortex-clang.git -b master prebuilts/clang/host/linux-x86/clang-ext
+        # git clone --depth 1 https://github.com/Shas45558/vortex-clang.git -b master prebuilts/clang/host/linux-x86/clang-ext
         
-    - name: Verify clang
-      run: |
-       ls -la ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}/prebuilts/clang/host/linux-x86/clang-ext/bin
-       clang --version
+    
         
     - name: Check Manifest Branch
       uses: haya14busa/action-cond@v1
@@ -161,12 +158,9 @@ jobs:
         set +e
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
-        export PATH="$GITHUB_WORKSPACE/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}/prebuilts/clang/host/linux-x86/clang-ext/bin:$PATH"
         set -e
-        export CC=clang-12
         lunch ${{ github.event.inputs.Lunch }}  
-        mka adbd recoveryimage CC=clang READELF=llvm-readelf OBJCOPY=llvm-objcopy AS=llvm-as LD=ld.lld NM=llvm-nm OBJDUMP=llvm-objdump STRIP=llvm-strip CROSS_COMPILE_ARM32=arm-linux-gnueabi-
-
+        mka adbd recoveryimage 
     - name: Set Build Date 
       run: |
         echo "BUILD_DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
