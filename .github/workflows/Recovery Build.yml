@@ -163,8 +163,7 @@ jobs:
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         set -e
-        ls -R prebuilts/clang/host/linux-x86/clang-ext
-        find prebuilts/clang/host/linux-x86/clang-ext -name clang
+        export CC=clang-12
         lunch ${{ github.event.inputs.Lunch }} && mka adbd recoveryimage
 
     - name: Set Build Date 
