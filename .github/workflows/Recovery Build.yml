@@ -164,7 +164,8 @@ jobs:
         export ALLOW_MISSING_DEPENDENCIES=true
         set -e
         export CC=clang-12
-        lunch ${{ github.event.inputs.Lunch }} && mka adbd recoveryimage
+        lunch ${{ github.event.inputs.Lunch }}  
+        mka adbd recoveryimage CC=clang READELF=llvm-readelf OBJCOPY=llvm-objcopy AS=llvm-as LD=ld.lld NM=llvm-nm OBJDUMP=llvm-objdump STRIP=llvm-strip CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
     - name: Set Build Date 
       run: |
