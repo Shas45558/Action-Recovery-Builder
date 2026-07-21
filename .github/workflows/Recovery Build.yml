@@ -144,7 +144,7 @@ jobs:
         echo "${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}/prebuilts/clang/host/linux-x86/clang-ext/bin" >> $GITHUB_PATH
 
     - name: Verify clang
-     run: |
+      run: |
        ls -la ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}/prebuilts/clang/host/linux-x86/clang-ext/bin
        clang --version
         
