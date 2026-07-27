@@ -139,7 +139,7 @@ jobs:
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
         rm -rf kernel/xiaomi/mt6768
         mkdir -p kernel/xiaomi
-        git clone --depth 1 https://github.com/Shas45558/oc_s_mt6768_kernel.git -b lineage-23.2 kernel/xiaomi/mt6768
+        git clone --depth 1 https://github.com/Shas45558/oc_s_mt6768_kernel.git -b los_s kernel/xiaomi/mt6768
         # git clone --depth 1 https://github.com/Shas45558/vortex-clang.git -b master prebuilts/clang/host/linux-x86/clang-ext
         
     
@@ -157,6 +157,8 @@ jobs:
         set +e
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
+        export LLVM=1
+        export LLVM_IAS=1
         set -e
         lunch ${{ github.event.inputs.Lunch }}  
         mka adbd recoveryimage 
