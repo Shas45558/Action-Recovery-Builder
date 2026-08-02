@@ -6,11 +6,11 @@ on:
       MANIFEST_URL:
         description: 'MANIFEST_URL (if want to use SSH keys, use git@github.com:XXXXX)'
         required: true
-        default: 'https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git'
+        default: 'https://github.com/Shas45558/platform_manifest_twrp_aosp.git'
       MANIFEST_BRANCH:
         description: 'MANIFEST_BRANCH'
         required: true
-        default: 'twrp-12.1'
+        default: 'twrp-14.1'
       DEVICE_TREE_URL:
         description: 'DEVICE_TREE_URL'
         required: true
@@ -36,7 +36,7 @@ on:
       MAKEFILE_NAME:
         description: 'MAKEFILE_NAME'
         required: true
-        default: 'twrp_lancelot'
+        default: 'twrp_lancelot-ap2a'
       BUILD_TARGET:
         description: 'BUILD_TARGET'
         required: true
@@ -125,11 +125,7 @@ jobs:
           -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} \
           ./${{ github.event.inputs.DEVICE_PATH }}
 
-    - name: bootable/recovery cleaner
-      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
-      run: |
-        rm -rf bootable/recovery
-    
+
   
     - name: Clone common tree
       if: |
