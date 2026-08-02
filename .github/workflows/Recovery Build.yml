@@ -125,10 +125,12 @@ jobs:
           -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} \
           ./${{ github.event.inputs.DEVICE_PATH }}
 
-        echo "===== Device tree ====="
-        ls -la ./${{ github.event.inputs.DEVICE_PATH }}
-        find ./${{ github.event.inputs.DEVICE_PATH }} -maxdepth 2 -type f | sort
+    - name: bootable/recovery cleaner
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
+      run: |
+        rm -rf bootable/recovery
+    
+  
     - name: Clone common tree
       if: |
         github.event.inputs.COMMON_TREE_URL != null
@@ -156,32 +158,14 @@ jobs:
       uses: pierotofy/set-swap-space@master
       with:
         swap-size-gb: 12
-    - name: Find task_profiles everywhere
-      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
-      run: |
-        grep -R "task_profiles.json" -n . || true
-        grep -R "task_profiles_30.json" -n . || true
     - name: Building recovery
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
       run: |
         source build/envsetup.sh
-
         export ALLOW_MISSING_DEPENDENCIES=true
-
-        echo "===== AndroidProducts.mk ====="
-        find device -name AndroidProducts.mk
-
-        echo "===== Device tree files ====="
-        find device/xiaomi/mt6768 -maxdepth 2 -type f | sort
-
-        echo "===== Available lunch combos ====="
-        lunch || true
-
-        echo "===== Building ====="
         lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng
-
         make clean
-        # make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
+        make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
       with:
