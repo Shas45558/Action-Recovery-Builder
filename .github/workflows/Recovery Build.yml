@@ -158,7 +158,7 @@ jobs:
         swap-size-gb: 12
     - name: Find task_profiles everywhere
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
-     run: |
+      run: |
         grep -R "task_profiles.json" -n . || true
         grep -R "task_profiles_30.json" -n . || true
     - name: Building recovery
