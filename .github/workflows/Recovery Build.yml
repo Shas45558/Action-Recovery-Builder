@@ -114,10 +114,11 @@ jobs:
       working-directory: workspace
 
     - name: Clone device tree
+      working-directory: ${{ steps.pwd.outputs.workspace-folder }}
       run: |
         git clone ${{ github.event.inputs.DEVICE_TREE_URL }} \
           -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} \
-          ./${{ github.event.inputs.DEVICE_PATH }}
+          ${{ github.event.inputs.DEVICE_PATH }}
 
     - name: Check Build Tree
       uses: haya14busa/action-cond@v1
@@ -143,7 +144,7 @@ jobs:
         find device -name AndroidProducts.mk
 
         echo "===== Device tree files ====="
-        find device/xiaomi/mt6768 -maxdepth 2 -type f | sort
+        find device/xiaomi/lancelot -maxdepth 2 -type f | sort
 
         echo "===== Available lunch combos ====="
         lunch || true
