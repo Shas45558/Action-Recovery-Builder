@@ -5,7 +5,7 @@ on:
       MANIFEST_BRANCH:
         description: 'OrangeFox Branch'
         required: true
-        default: '12.1'
+        default: '14.1'
         type: choice
         options:
         - 14.1
@@ -155,7 +155,7 @@ jobs:
         export LLVM_IAS=1
         set -e
         lunch ${{ github.event.inputs.Lunch }}  
-        mka adbd recoveryimage 
+        mka vold adbd recoveryimage 
     - name: Set Build Date 
       run: |
         echo "BUILD_DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
