@@ -39,7 +39,7 @@ on:
       Lunch:
         description: 'What you want to build?'
         required: true
-        default: 'twrp_lancelot-ap2a-eng'
+        default: 'twrp_lancelot-eng'
         type: choice
         options:
         - twrp_lancelot-eng
@@ -99,14 +99,6 @@ jobs:
       with:
         swap-size-gb: 24
 
-    # 1. We cache the entire pulled OrangeFox directory based on the selected branch.
-    - name: Cache OrangeFox Source
-      id: cache-source
-      uses: actions/cache@v4
-      with:
-        path: ${{ github.workspace }}/OrangeFox
-        key: ofrp-source-${{ github.event.inputs.MANIFEST_BRANCH }}
-
     - name: Build Environment
       run: |
         sudo apt update
@@ -115,9 +107,8 @@ jobs:
         git clone https://gitlab.com/OrangeFox/misc/scripts
         cd scripts
         sudo bash setup/android_build_env.sh
-    # 2. This step runs ONLY if SKIP_SYNC is false AND the cache doesn't already exist.
+
     - name: Set-up Manifest
-      if: ${{ steps.cache-source.outputs.cache-hit != 'true' && (github.event.inputs.MANIFEST_BRANCH == '11.0' || github.event.inputs.MANIFEST_BRANCH == '12.1' || github.event.inputs.MANIFEST_BRANCH == '14.1') }}
       run: |
         mkdir -p ${GITHUB_WORKSPACE}/OrangeFox
         cd ${GITHUB_WORKSPACE}/OrangeFox
