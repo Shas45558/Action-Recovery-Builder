@@ -130,11 +130,13 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
         FILE="system/core/fs_mgr/Android.bp"
-        echo "Before patch:"
-        grep -n '"libfscrypttwrp"' "$FILE" || true
-        sed -i '/"libfscrypttwrp",/d' "$FILE"
-        echo "After patch:"
-        grep -n '"libfscrypttwrp"' "$FILE" || true
+        echo "=== Before patch ==="
+        grep -n -B3 -A3 '"libfscrypttwrp"' "$FILE" || true
+        # Remove libfscrypttwrp from libfs_mgr's whole_static_libs.
+        sed -i '/^[[:space:]]*"libfscrypttwrp",[[:space:]]*$/d' "$FILE"
+        echo "=== After patch ==="
+        grep -n -B3 -A3 '"libfscrypttwrp"' "$FILE" || true
+        echo "=== Git diff ==="
         git diff -- "$FILE"
     - name: Clone Device Dependencies and clang
       run: |
