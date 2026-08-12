@@ -155,7 +155,7 @@ jobs:
         export LLVM_IAS=1
         set -e
         lunch ${{ github.event.inputs.Lunch }}  
-        mka adbd recoveryimage 
+        mka adbd vold
     - name: Set Build Date 
       run: |
         echo "BUILD_DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
