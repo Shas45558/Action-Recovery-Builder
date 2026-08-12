@@ -126,7 +126,16 @@ jobs:
         git clone ${{ github.event.inputs.DEVICE_TREE }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ./${{ github.event.inputs.DEVICE_PATH }}
         cd ${{ github.event.inputs.DEVICE_PATH }}
         echo "COMMIT_ID=$(git rev-parse HEAD)" >> $GITHUB_ENV
-        
+    - name: Patch fs_mgr Android.bp
+      run: |
+        cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
+        FILE="system/core/fs_mgr/Android.bp"
+        echo "Before patch:"
+        grep -n '"libfscrypttwrp"' "$FILE" || true
+        sed -i '/"libfscrypttwrp",/d' "$FILE"
+        echo "After patch:"
+        grep -n '"libfscrypttwrp"' "$FILE" || true
+        git diff -- "$FILE"
     - name: Clone Device Dependencies and clang
       run: |
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
