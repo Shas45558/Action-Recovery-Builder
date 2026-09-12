@@ -6,19 +6,19 @@ on:
       MANIFEST_URL:
         description: 'MANIFEST_URL (if want to use SSH keys, use git@github.com:XXXXX)'
         required: true
-        default: 'https://github.com/Shas45558/A14_platform_manifest_twrp_aosp.git'
+        default: 'https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git'
       MANIFEST_BRANCH:
         description: 'MANIFEST_BRANCH'
         required: true
-        default: 'twrp-14'
+        default: 'twrp-12.1'
       DEVICE_TREE_URL:
         description: 'DEVICE_TREE_URL'
         required: true
-        default: 'https://github.com/Shas45558/S_mt6768_twrp.git'
+        default: 'https://github.com/Shas45558/twrp_tree_mt6768.git'
       DEVICE_TREE_BRANCH:
         description: 'DEVICE_TREE_BRANCH'
         required: true
-        default: 'twrp-14'
+        default: 'a14_lancelot'
       DEVICE_PATH:
         description: 'DEVICE_PATH'
         required: true
@@ -30,7 +30,7 @@ on:
       MAKEFILE_NAME:
         description: 'MAKEFILE_NAME'
         required: true
-        default: 'twrp_lancelot-ap2a-eng'
+        default: 'twrp_lancelot-eng'
       BUILD_TARGET:
         description: 'BUILD_TARGET'
         required: true
@@ -120,6 +120,7 @@ jobs:
         git clone ${{ github.event.inputs.DEVICE_TREE_URL }} \
           -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} \
           ${{ github.event.inputs.DEVICE_PATH }}
+        git clone --depth 1 https://github.com/Not-a-dude/android_kernel_xiaomi_mt6768.git -b kernel-tree kernel/xiaomi/mt6768
 
 
 
