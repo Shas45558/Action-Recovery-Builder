@@ -121,8 +121,8 @@ jobs:
           -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} \
           ${{ github.event.inputs.DEVICE_PATH }}
         git clone --depth 1 https://github.com/Not-a-dude/android_kernel_xiaomi_mt6768.git -b kernel-tree kernel/xiaomi/mt6768
-
-
+        sed -i '/obj-\$(CONFIG_KSU) += kernelsu\//d' kernel/xiaomi/mt6768/drivers/Makefile
+        sed -i '/source "drivers\/kernelsu\/Kconfig"/d' kernel/xiaomi/mt6768/drivers/Kconfig
 
     - name: Set Swap Space
       uses: pierotofy/set-swap-space@master
