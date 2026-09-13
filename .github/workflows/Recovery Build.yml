@@ -148,14 +148,10 @@ jobs:
     - name: Building OrangeFox
       run: |
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
-        set +e
-        source build/envsetup.sh
-        export ALLOW_MISSING_DEPENDENCIES=true
-        export LLVM=1
-        export LLVM_IAS=1
-        set -e
-        lunch ${{ github.event.inputs.Lunch }}  
-        mka adbd recoveryimage
+        find . -name "Decrypt.cpp"
+        find . -name "aidl_language.cpp"
+        find . -name "libguitwrp_defaults.go"
+
     - name: Set Build Date 
       run: |
         echo "BUILD_DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
