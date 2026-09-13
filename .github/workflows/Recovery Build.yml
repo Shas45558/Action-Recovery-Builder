@@ -142,7 +142,10 @@ jobs:
         patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/patch/0001-vold-fbe-fixes.patch
         patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/patch/0002-aidl-uninitialized-pointer.patch
         patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/patch/0003-twrp-theme-absolute-out.patch
-
+        source build/envsetup.sh
+        export ALLOW_MISSING_DEPENDENCIES=true
+        lunch ${{ github.event.inputs.Lunch }}  
+        mka adbd recoveryimage
     - name: Set Build Date 
       run: |
         echo "BUILD_DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
