@@ -14,11 +14,11 @@ on:
       DEVICE_TREE_URL:
         description: 'DEVICE_TREE_URL'
         required: true
-        default: 'https://github.com/Shas45558/twrp_tree_mt6768.git'
+        default: 'https://github.com/Shas45558/S-Vendor-Twrp-Tree-for-mt6768-old.git'
       DEVICE_TREE_BRANCH:
         description: 'DEVICE_TREE_BRANCH'
         required: true
-        default: 'a14_lancelot'
+        default: 'Tt'
       DEVICE_PATH:
         description: 'DEVICE_PATH'
         required: true
@@ -30,7 +30,7 @@ on:
       MAKEFILE_NAME:
         description: 'MAKEFILE_NAME'
         required: true
-        default: 'twrp_lancelot-eng'
+        default: 'twrp_lancelot-ap2a-eng'
       BUILD_TARGET:
         description: 'BUILD_TARGET'
         required: true
