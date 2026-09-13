@@ -142,6 +142,8 @@ jobs:
         patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/patch/0001-vold-fbe-fixes.patch
         patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/patch/0002-aidl-uninitialized-pointer.patch
         patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/patch/0003-twrp-theme-absolute-out.patch
+        export SHELL=/bin/bash
+        bash
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         lunch ${{ github.event.inputs.Lunch }}  
