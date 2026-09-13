@@ -14,11 +14,11 @@ on:
       DEVICE_TREE:
         description: 'Custom Recovery Tree'
         required: true
-        default: 'https://github.com/Shas45558/S_mt6768_twrp.git'
+        default: 'https://github.com/Shas45558/TWRP_S_MT6768.git'
       DEVICE_TREE_BRANCH:
         description: 'Custom Recovery Tree Branch'
         required: true
-        default: 'twrp-12.1'
+        default: 'recovery-12.1'
       DEVICE_PATH:
         description: 'Specify your device path.'
         required: true
