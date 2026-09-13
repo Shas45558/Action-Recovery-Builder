@@ -139,9 +139,9 @@ jobs:
     - name: Building OrangeFox
       run: |
         cd ${GITHUB_WORKSPACE}/OrangeFox/fox_${{ github.event.inputs.MANIFEST_BRANCH }}
-        patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/0001-vold-fbe-fixes.patch
-        patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/0002-aidl-uninitialized-pointer.patch
-        patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/0003-twrp-theme-absolute-out.patch
+        patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/patch/0001-vold-fbe-fixes.patch
+        patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/patch/0002-aidl-uninitialized-pointer.patch
+        patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/patch/0003-twrp-theme-absolute-out.patch
 
     - name: Set Build Date 
       run: |
