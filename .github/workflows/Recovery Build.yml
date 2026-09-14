@@ -73,7 +73,7 @@ on:
 jobs:
   build:
     name: Build OFRP by ${{ github.actor }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: github.event.repository.owner.id == github.event.sender.id
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -142,6 +142,15 @@ jobs:
         patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/patch/0001-vold-fbe-fixes.patch
         patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/patch/0002-aidl-uninitialized-pointer.patch
         patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/patch/0003-twrp-theme-absolute-out.patch
+        echo "===== BASH DEBUG ====="
+        echo "BASH_VERSION=$BASH_VERSION"
+        echo "BASH=$BASH"
+        type -a bash
+        echo "===== VENDORSETUP ====="
+        cat device/xiaomi/lancelot/vendorsetup.sh
+        echo "===== ENVSETUP SECTION ====="
+        sed -n '1865,1885p' build/envsetup.sh
+        echo "======================="
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         lunch ${{ github.event.inputs.Lunch }}  
