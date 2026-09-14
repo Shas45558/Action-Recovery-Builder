@@ -18,7 +18,7 @@ on:
       DEVICE_TREE_BRANCH:
         description: 'Custom Recovery Tree Branch'
         required: true
-        default: 'recovery-12.1'
+        default: 'Lancelot'
       DEVICE_PATH:
         description: 'Specify your device path.'
         required: true
@@ -142,8 +142,6 @@ jobs:
         patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/patch/0001-vold-fbe-fixes.patch
         patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/patch/0002-aidl-uninitialized-pointer.patch
         patch -p1 < ${{ github.event.inputs.DEVICE_PATH }}/patch/0003-twrp-theme-absolute-out.patch
-        export SHELL=/bin/bash
-        bash
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
         lunch ${{ github.event.inputs.Lunch }}  
